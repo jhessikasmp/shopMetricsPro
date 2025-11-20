@@ -36,3 +36,18 @@ Thumbs.db
 
 # Misc
 *.pid
+
+# Secrets/keys (local SSL, etc.)
+*.pem
+*.key
+*.crt
+*.pfx
+.envrc
+
+# Editor/cache/temp
+.eslintcache
+*.swp
+*.swo
+.node_repl_history
+tmp/
+temp/

@@ -23,6 +23,9 @@ import { shopifyRouter } from './routes/shopify.js';
 
 async function bootstrap() {
   const app = express();
+  if (isProd) {
+    app.set('trust proxy', 1);
+  }
 
   // Security headers
   app.use(helmet({
