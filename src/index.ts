@@ -19,7 +19,6 @@ import { productsRouter } from './routes/products.js';
 import { ordersRouter } from './routes/orders.js';
 import { devRouter } from './routes/dev.js';
 import { shopifyRouter } from './routes/shopify.js';
-// use env directly; avoid duplicate imports
 
 async function bootstrap() {
   const app = express();
@@ -27,12 +26,10 @@ async function bootstrap() {
     app.set('trust proxy', 1);
   }
 
-  // Security headers
   app.use(helmet({
     contentSecurityPolicy: false,
   }));
 
-  // Explicit extra headers
   app.use((_: Request, res: Response, next: NextFunction) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -42,7 +39,6 @@ async function bootstrap() {
     next();
   });
 
-  // Rate limiting 100 req/min/IP
   app.use(rateLimit({ windowMs: 60 * 1000, max: 100 }));
 
   app.use(cors({ origin: env.CORS_ORIGIN ? env.CORS_ORIGIN.split(',').map(s => s.trim()) : true }));
@@ -52,10 +48,8 @@ async function bootstrap() {
 
   app.use(passport.initialize());
 
-  // Health route
   app.get('/healthz', (_req: Request, res: Response) => res.json({ status: 'ok' }));
 
-  // Auth & domain routes
   app.use('/auth', authRouter);
   app.use('/reports', reportsRouter);
   app.use('/products', productsRouter);
@@ -66,18 +60,15 @@ async function bootstrap() {
   }
   app.use('/shopify', shopifyRouter);
 
-  // Swagger (placeholder doc)
   const { swaggerDoc } = await import('./routes/swagger.js');
   app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc as any));
 
-  // Apollo GraphQL
   const apollo = new ApolloServer({ typeDefs, resolvers });
   await apollo.start();
   app.use('/graphql', expressMiddleware(apollo, {
     context: async ({ req }: { req: Request }) => ({ token: req.headers.authorization || null }),
   }));
 
-  // DB init
   if (skipDbInit) {
     console.log('DB init skipped by SKIP_DB_INIT');
   } else {
