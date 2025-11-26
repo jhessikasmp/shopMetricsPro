@@ -168,3 +168,4 @@ Notes
 
 ## Contact
 Questions or suggestions: jhessika.smp@gmail.com
+# shopMetricsDEMO
